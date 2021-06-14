@@ -1,0 +1,8 @@
+## Interface: 11305
+## Title: MasterPrepare
+## Author: markg
+## Notes: Master target enemy
+## Dependencies: MasterCore
+## SavedVariables: MasterPrepareConfig
+## SavedVariablesPerCharacter: MasterPrepareConfigCharacter
+MasterPrepare.xml
