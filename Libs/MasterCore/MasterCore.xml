@@ -1,0 +1,14 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+    <Script file="Source\Init.lua"/>
+    <Script file="Source\Api.lua"/>
+    <Script file="Source\Print.lua"/>
+    <Script file="Source\Class.lua"/>
+    <Script file="Source\Config.lua"/>
+    <Script file="Source\Dialog.lua"/>
+    <Script file="Source\Enums.lua"/>
+    <Script file="Source\Models\ItemInfo.lua"/>
+    <Script file="Source\Models\ContainerItemInfo.lua"/>
+    <Script file="Source\Controllers\EventController.lua"/>
+    <Script file="Source\Controllers\FrameController.lua"/>
+</Ui>

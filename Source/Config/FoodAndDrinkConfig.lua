@@ -10,35 +10,41 @@ local FOOD_AND_DRINK_CONFIG_TYPE = {
 }
 MasterPrepare.FOOD_AND_DRINK_CONFIG_TYPE = FOOD_AND_DRINK_CONFIG_TYPE
 
-local ConfigFoodAndDrink, super = MasterCore.Class:Create("ConfigFoodAndDrink", MasterCore.Config)
-MasterPrepare.ConfigFoodAndDrink = ConfigFoodAndDrink
-function ConfigFoodAndDrink:Init(type, db)
+local FoodAndDrinkConfig, super = MasterCore.Class:Create("FoodAndDrinkConfig", MasterCore.Config)
+MasterPrepare.FoodAndDrinkConfig = FoodAndDrinkConfig
+function FoodAndDrinkConfig:Init(type, db, order)
     self = super.Init(self, db[type])
     self.type = type
+    self.order = order
+
+    if self.type == FOOD_AND_DRINK_CONFIG_TYPE.FOOD then
+        self.name = L["Food"]
+    end
+
+    if self.type == FOOD_AND_DRINK_CONFIG_TYPE.DRINK then
+        self.name = L["Drink"]
+    end
+
     return self
 end
 
-function ConfigFoodAndDrink:GetOptions()
-    local name, order, itemName, stat
+function FoodAndDrinkConfig:GetOptions()
+    local itemName, stat
     if self.type == FOOD_AND_DRINK_CONFIG_TYPE.FOOD then
-        name = L["Food"]
-        order = 1
         itemName = "food"
         stat = "Health Point"
     end
 
     if self.type == FOOD_AND_DRINK_CONFIG_TYPE.DRINK then
-        name = L["Drink"]
-        order = 2
         itemName = "drink"
         stat = "Mana Point"
     end
 
     return {
-        name = name,
+        name = self.name,
         type = 'group',
         handler = self,
-        order = order,
+        order = self.order,
         args = {
             intro = {
                 order = self:_AutoIncrementOrder(true),
@@ -74,7 +80,7 @@ function ConfigFoodAndDrink:GetOptions()
                     return not self.db.enable
                 end
             },
-            maxRestock= {
+            maxRestock = {
                 order = self:_AutoIncrementOrder(),
                 type = "range",
                 name = "Max Restock Quantity",
@@ -115,6 +121,21 @@ function ConfigFoodAndDrink:GetOptions()
                 disabled = function()
                     return not self.db.enable
                 end
+            },
+            actionBarKey = {
+                order = self:_AutoIncrementOrder(),
+                type = "keybinding",
+                name = "Action Bar Key",
+                desc = "Set action bar slot to auto swap " .. itemName .. "s in this character's bag to this slot",
+                validate = function(_, value)
+                    if GetActionSlot(value) == nil then
+                        return "This key is not binded to any Action Button yet!"
+                    end
+
+                    return true
+                end,
+                set = "Set",
+                get = "GetActionBarKey",
             },
             con = {
                 order = self:_AutoIncrementOrder(),
@@ -175,53 +196,57 @@ function ConfigFoodAndDrink:GetOptions()
     }
 end
 
-function ConfigFoodAndDrink:GetEnable()
+function FoodAndDrinkConfig:GetEnable()
     return self:Get("enable")
 end
 
-function ConfigFoodAndDrink:GetMinRestock()
+function FoodAndDrinkConfig:GetMinRestock()
     return self:Get("minRestock")
 end
 
-function ConfigFoodAndDrink:GetMaxRestock()
+function FoodAndDrinkConfig:GetMaxRestock()
     return self:Get("maxRestock")
 end
 
-function ConfigFoodAndDrink:GetAlwaysRestock()
+function FoodAndDrinkConfig:GetAlwaysRestock()
     return self:Get("alwaysRestock")
 end
 
-function ConfigFoodAndDrink:GetSellJunks()
+function FoodAndDrinkConfig:GetSellJunks()
     return self:Get("sellJunks")
 end
 
-function ConfigFoodAndDrink:SetCriteria(info, value)
+function FoodAndDrinkConfig:GetActionBarKey()
+    return self:Get("actionBarKey")
+end
+
+function FoodAndDrinkConfig:SetCriteria(info, value)
     local key = self:_GetKey(info)
     self.db.criteria[key] = value
 end
 
-function ConfigFoodAndDrink:GetCriteria(info)
+function FoodAndDrinkConfig:GetCriteria(info)
     local key = self:_GetKey(info)
     return self.db.criteria[key]
 end
 
-function ConfigFoodAndDrink:GetCriteriaUsable()
+function FoodAndDrinkConfig:GetCriteriaUsable()
     return self:GetCriteria("usable")
 end
 
-function ConfigFoodAndDrink:GetCriteriaMostValue()
+function FoodAndDrinkConfig:GetCriteriaMostValue()
     return self:GetCriteria("mostValue")
 end
 
-function ConfigFoodAndDrink:GetCriteriaSaveBagSpace()
+function FoodAndDrinkConfig:GetCriteriaSaveBagSpace()
     return self:GetCriteria("saveBagSpace")
 end
 
-function ConfigFoodAndDrink:GetAllCriteria()
+function FoodAndDrinkConfig:GetAllCriteria()
     return self.db.criteria
 end
 
-function ConfigFoodAndDrink:GetDefaults()
+function FoodAndDrinkConfig:GetDefaults()
     return {
         enable = true,
         minRestock = 20,

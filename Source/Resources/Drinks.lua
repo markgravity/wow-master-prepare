@@ -13,10 +13,9 @@ MasterPrepare.VENDOR_DRINKS = {
     { id = 1708, effectValue = 1345, minLevel = 25 }, -- Sweet Nectar
     { id = 1645, effectValue = 1992, minLevel = 35 }, -- Moonberry Juice
     { id = 19300, effectValue = 1992, minLevel = 35 }, -- Bottled Winterspring Water
-    { id = 13724, effectValue = 2148, minLevel = 45 }, -- Enriched Manna Biscuit
+    --{ id = 13724, effectValue = 2148, minLevel = 45 }, -- Enriched Manna Biscuit
     { id = 8766, effectValue = 2934, minLevel = 45 }, -- Morning Glory Dew
     { id = 38429, effectValue = 2934, minLevel = 45 }, -- Blackrock Spring Water
-    { id = 19301, effectValue = 4410, minLevel = 51 }, -- Alterac Manna Biscuit
     { id = 32455, effectValue = 4200, minLevel = 55 }, -- Star's Lament
     { id = 29454, effectValue = 5100, minLevel = 55 }, -- Silverwine
     { id = 28399, effectValue = 5100, minLevel = 60 }, -- Filtered Draenic Water

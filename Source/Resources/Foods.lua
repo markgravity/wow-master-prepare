@@ -56,4 +56,43 @@ MasterPrepare.VENDOR_FOODS = {
     { id = 16168, effectValue = 1392, minLevel = 35 }, -- Heaven Peach
     { id = 18635, effectValue = 1392, minLevel = 35 }, -- Bellara's Nutterbar
     { id = 17408, effectValue = 1392, minLevel = 35 }, -- Spicy Beefstick
+    { id = 19306, effectValue = 1392, minLevel = 35 }, -- Crunchy Frog
+    { id = 21030, effectValue = 1392, minLevel = 35 }, -- Darnassus Kimchi Pie
+    { id = 8932, effectValue = 2148, minLevel = 45 }, -- Alterac Swiss
+    { id = 13724, effectValue = 2148, minLevel = 45 }, -- Enriched Manna Biscuit
+    { id = 8952, effectValue = 2148, minLevel = 45 }, -- Roasted Quail
+    { id = 19225, effectValue = 2148, minLevel = 45 }, -- Deep Fried Candybar
+    { id = 8953, effectValue = 2148, minLevel = 45 }, -- Deep Fried Plantains
+    { id = 11444, effectValue = 2148, minLevel = 45 }, -- Grim Guzzler Boar
+    { id = 8957, effectValue = 2148, minLevel = 45 }, -- Spinefin Halibut
+    { id = 22324, effectValue = 2148, minLevel = 45 }, -- Winter Kimchi
+    { id = 8950, effectValue = 2148, minLevel = 45 }, -- Homemade Cherry Pie
+    { id = 8948, effectValue = 2148, minLevel = 45 }, -- Dried King Bolete
+    { id = 21031, effectValue = 2148, minLevel = 45 }, -- Cabbage Kimchi
+    { id = 23160, effectValue = 2148, minLevel = 45 }, -- Friendship Bread
+    { id = 21033, effectValue = 2148, minLevel = 45 }, -- Radish Kimchi
+    { id = 27858, effectValue = 4320, minLevel = 55 }, -- Sunspring Carp
+    { id = 27854, effectValue = 4320, minLevel = 55 }, -- Smoked Talbuk Venison
+    { id = 27859, effectValue = 4320, minLevel = 55 }, -- Zangar Caps
+    { id = 27856, effectValue = 4320, minLevel = 55 }, -- Skethyl Berries
+    { id = 27855, effectValue = 4320, minLevel = 55 }, -- Mag'har Grainbread
+    { id = 27857, effectValue = 4320, minLevel = 55 }, -- Garadar Sharp
+    { id = 24539, effectValue = 4320, minLevel = 55 }, -- Marsh Lichen
+    { id = 24008, effectValue = 4320, minLevel = 55 }, -- Dried Mushroom Rations
+    { id = 24009, effectValue = 4320, minLevel = 55 }, -- Dried Fruit Rations
+    { id = 29393, effectValue = 4320, minLevel = 55 }, -- Diamond Berries
+    { id = 29412, effectValue = 4320, minLevel = 55 }, -- Jessen's Special Slop
+    { id = 32721, effectValue = 6000, minLevel = 55 }, -- Skyguard Rations
+    { id = 28486, effectValue = 4320, minLevel = 55 }, -- Moser's Magnificent Muffin
+    { id = 38427, effectValue = 4320, minLevel = 55 }, -- Pickled Egg
+    { id = 29451, effectValue = 7500, minLevel = 65 }, -- Clefthoof Ribs
+    { id = 29453, effectValue = 7500, minLevel = 65 }, -- Sporeggar Mushroom
+    { id = 29449, effectValue = 7500, minLevel = 65 }, -- Bladespire Bagel
+    { id = 29450, effectValue = 7500, minLevel = 65 }, -- Telaari Grapes
+    { id = 29448, effectValue = 7500, minLevel = 65 }, -- Mag'har Mild Cheese
+    { id = 29452, effectValue = 7500, minLevel = 65 }, -- Zangar Trout
+    { id = 29394, effectValue = 7500, minLevel = 65 }, -- Lyribread
+    { id = 32722, effectValue = 4320, minLevel = 65 }, -- Enriched Terocone Juice
+    { id = 38428, effectValue = 7500, minLevel = 65 }, -- Rock-Salted Pretzel
+    { id = 30355, effectValue = 7500, minLevel = 65 }, -- Grilled Shadowmoon Tuber
 }

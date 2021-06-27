@@ -28,10 +28,13 @@ function NecessityItemPreparation:Init(type)
 end
 
 function NecessityItemPreparation:Check()
-    self.suitableItems = self:_FindMostSuitableItems()
-    self.numberNeeded = self:_GetNumberNeeded()
+    local config = self:_GetConfig()
 
-    return self.numberNeeded <= 0, self.suitableItems, self.numberNeeded
+    self.suitableItems = self:_FindMostSuitableItems()
+    local numberNeeded, current = self:_GetNumberNeeded(self.suitableItems)
+    self.numberNeeded = numberNeeded
+
+    return current >= config:GetMinRestock(), self.suitableItems, self.numberNeeded
 end
 
 function NecessityItemPreparation:GetJunks()
@@ -99,20 +102,20 @@ function NecessityItemPreparation:_FindMostSuitableItems()
     return suitableItems
 end
 
-function NecessityItemPreparation:_GetNumberNeeded()
+function NecessityItemPreparation:_GetNumberNeeded(items)
     local config = self:_GetConfig()
-    local current = self:_GetTotalQuantityInBags()
+    local current = self:_GetTotalQuantityInBags(items)
 
     if (config:GetAlwaysRestock() and current < config:GetMaxRestock())
             or current < config:GetMinRestock() then
-        return config:GetMaxRestock() - current
+        return config:GetMaxRestock() - current, current
     end
-    return 0
+    return 0, current
 end
 
-function NecessityItemPreparation:_GetTotalQuantityInBags()
+function NecessityItemPreparation:_GetTotalQuantityInBags(items)
     local totalQuantity = 0
-    for _, item in pairs(self.suitableItems) do
+    for _, item in pairs(items) do
         for bag = 0, NUM_BAG_SLOTS do
             local numSlots = GetContainerNumSlots(bag)
             if numSlots > 0 then
@@ -129,7 +132,6 @@ function NecessityItemPreparation:_GetTotalQuantityInBags()
 
     return totalQuantity
 end
-
 
 function NecessityItemPreparation:_GetConfig()
     if self.type == NECESSITY_ITEM_TYPE.FOOD then

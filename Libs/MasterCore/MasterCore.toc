@@ -1,0 +1,15 @@
+## Interface: 11305
+## Title: MasterCore
+## Author: markg
+## Notes: Core lib for master addons
+## Dependencies:
+Source\Init.lua
+Source\Api.lua
+Source\Class.lua
+Source\Config.lua
+Source\Dialog.lua
+Source\Enums.lua
+Source\Models\ItemInfo.lua
+Source\Models\ContainerItemInfo.lua
+Source\Controllers\EventController.lua
+Source\Controllers\FrameController.lua

@@ -8,3 +8,4 @@ if not L then return end
 
 L["Food"] = "Food"
 L["Drink"] = "Drink"
+L["Gear"] = "Gear"

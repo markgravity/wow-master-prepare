@@ -4,11 +4,32 @@
 --- DateTime: 14/06/2021 11:22
 ---
 local Config = MasterPrepare.Config
+local BagJunkMarkerController = MasterPrepare.BagJunkMarkerController
+local SCRIPT_HANDLER = MasterCore.SCRIPT_HANDLER
+local NotPrepareDebuffButtonController = MasterPrepare.NotPrepareDebuffButtonController
+local NecessityActionButtonController = MasterPrepare.NecessityActionButtonController
+local NECESSITY_ITEM_TYPE = MasterPrepare.NECESSITY_ITEM_TYPE
+local AceEvent = LibStub("AceEvent-3.0")
+local MESSAGE = MasterPrepare.MESSAGE
 
 MasterPrepareAddon = LibStub("AceAddon-3.0"):NewAddon(MASTER_PREPARE_NAME, "AceConsole-3.0")
 function MasterPrepareAddon:OnInitialize()
-    local frame = CreateFrame("Frame")
-
     Config:Setup()
-    RegisterEventsForControllers(frame, MasterPrepare.PreparationController:Init())
+
+    local frame = CreateFrame("Frame")
+    local bagJunkMarkerController = BagJunkMarkerController:Init()
+    frame:SetScript(SCRIPT_HANDLER.ON_UPDATE, function()
+        bagJunkMarkerController:OnUpdate()
+    end)
+
+    RegisterEventsForControllers(MasterPrepare.PreparationController:Init(),
+                                 NotPrepareDebuffButtonController:Init()
+    )
+
+    local food = NecessityActionButtonController:Init(NECESSITY_ITEM_TYPE.FOOD)
+    local drink = NecessityActionButtonController:Init(NECESSITY_ITEM_TYPE.DRINK)
+    AceEvent:RegisterMessage(MESSAGE.PREPRATION_CHECKED, function(message, _, ...)
+        food:OnMessage(message, ...)
+        drink:OnMessage(message, ...)
+    end)
 end

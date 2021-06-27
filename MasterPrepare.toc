@@ -2,7 +2,7 @@
 ## Title: MasterPrepare
 ## Author: markg
 ## Notes: Master target enemy
-## Dependencies: MasterCore
+## Dependencies:
 ## SavedVariables: MasterPrepareConfig
 ## SavedVariablesPerCharacter: MasterPrepareConfigCharacter
 MasterPrepare.xml

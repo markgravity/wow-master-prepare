@@ -6,7 +6,12 @@
 local NecessityItemPreparation = MasterPrepare.NecessityItemPreparation
 local NECESSITY_ITEM_TYPE = MasterPrepare.NECESSITY_ITEM_TYPE
 local EVENT = MasterCore.EVENT
+local AceEvent = LibStub("AceEvent-3.0")
+local MESSAGE = MasterPrepare.MESSAGE
 local Config = MasterPrepare.Config
+local GearAutoRepairPreparation = MasterPrepare.GearAutoRepairPreparation
+local GearAutoSellPreparation = MasterPrepare.GearAutoSellPreparation
+local Dialog = MasterCore.Dialog
 
 local PreparationController, super = MasterCore.Class:Create("PreparationController", MasterCore.EventController)
 MasterPrepare.PreparationController = PreparationController
@@ -15,33 +20,86 @@ function PreparationController:Init()
     self = super.Init(self, {
         EVENT.MERCHANT_SHOW,
         EVENT.BAG_UPDATE,
+        EVENT.BAG_OPEN,
         EVENT.TAXIMAP_OPENED,
-        EVENT.CONFIRM_SUMMON
+        EVENT.CONFIRM_SUMMON,
+        EVENT.PLAYER_ENTERING_WORLD
     })
     self.food = NecessityItemPreparation:Init(NECESSITY_ITEM_TYPE.FOOD)
     self.drink = NecessityItemPreparation:Init(NECESSITY_ITEM_TYPE.DRINK)
+    self.autoRepair = GearAutoRepairPreparation:Init()
+    self.autoSell = GearAutoSellPreparation:Init()
 
     return self
 end
 
 function PreparationController:OnEvent(event)
     if event == EVENT.MERCHANT_SHOW then
-        self:_Check()
         Wait(1, function()
+            self:_Check()
             self:_Prepare()
         end)
         return
     end
+
+    if event == EVENT.BAG_UPDATE or event == EVENT.PLAYER_ENTERING_WORLD then
+        self:_Check()
+        return
+    end
+
+    if event == EVENT.TAXIMAP_OPENED or event == EVENT.CONFIRM_SUMMON then
+        local isPrepared = self:_Check()
+        if not isPrepared then
+            Dialog:Confirm("YOU'RE NOT PREPARED!!\nAre you sure you want to go?")
+        end
+    end
 end
 
 function PreparationController:_Check()
+    local checkCount = 0
+    local totalCheck = 4
+
     if Config.food:GetEnable() then
-        self.food:Check()
+        if self.food:Check() then
+            --print("food")
+            checkCount = checkCount + 1
+        end
+    else
+        checkCount = checkCount + 1
     end
 
     if Config.drink:GetEnable() then
-        self.drink:Check()
+        if self.drink:Check() then
+            checkCount = checkCount + 1
+        end
+    else
+        checkCount = checkCount + 1
     end
+
+    if Config.gear.autoRepair:GetEnable() then
+        if self.autoRepair:Check() then
+            --print("repair")
+            checkCount = checkCount + 1
+        end
+    else
+        checkCount = checkCount + 1
+    end
+
+    if Config.gear.autoSell:GetEnable() then
+        if self.autoSell:Check() then
+            --print("sell")
+            checkCount = checkCount + 1
+        end
+        AceEvent:SendMessage(MESSAGE.JUNK_ITEMS_UPDATED, self.autoSell.items)
+    else
+        checkCount = checkCount + 1
+    end
+
+    --print(checkCount, totalCheck)
+    local isPrepared = checkCount == totalCheck
+    AceEvent:SendMessage(MESSAGE.PREPRATION_CHECKED, isPrepared, self.food, self.drink, self.autoRepair, self.autoSell)
+
+    return isPrepared
 end
 
 function PreparationController:_Prepare()
@@ -50,35 +108,49 @@ function PreparationController:_Prepare()
 
     -- Nothing to restock
     if numFoodNeeded + numDrinkNeeded <= 0 then
-        self:_SellItems(self.food:GetJunks())
-        self:_SellItems(self.drink:GetJunks())
-        return
+        self:_Sell(self.food:GetJunks())
+        self:_Sell(self.drink:GetJunks())
+    else
+        -- Buy foods or drinks from merchant, if it's available
+        for i = 1, GetMerchantNumItems() do
+            local itemLink = GetMerchantItemLink(i)
+            local itemId = GetItemID(itemLink)
+            if numFoodNeeded > 0 and self.food.suitableItems[itemId] ~= nil then
+                MassiveBuyMerchantItem(i, numFoodNeeded)
+                numFoodNeeded = 0
+                self:_Sell(self.food:GetJunks())
+            end
+
+            if numDrinkNeeded > 0 and self.drink.suitableItems[itemId] ~= nil then
+                MassiveBuyMerchantItem(i, numDrinkNeeded)
+                numDrinkNeeded = 0
+                self:_Sell(self.drink:GetJunks())
+            end
+
+            -- All restock
+            if numFoodNeeded + numDrinkNeeded <= 0 then
+                break
+            end
+        end
     end
 
-    -- Buy foods or drinks from merchant, if it's available
-    for i = 1, GetMerchantNumItems() do
-        local itemLink = GetMerchantItemLink(i)
-        local itemId = GetItemID(itemLink)
-        if numFoodNeeded > 0 and self.food.suitableItems[itemId] ~= nil then
-            MassiveBuyMerchantItem(i, numFoodNeeded)
-            numFoodNeeded = 0
-            self:_SellItems(self.food:GetJunks())
-        end
-
-        if numDrinkNeeded > 0 and self.drink.suitableItems[itemId] ~= nil then
-            MassiveBuyMerchantItem(i, numDrinkNeeded)
-            numDrinkNeeded = 0
-            self:_SellItems(self.drink:GetJunks())
-        end
-
-        -- All restock
-        if numFoodNeeded + numDrinkNeeded <= 0 then
-            return
-        end
+    -- Auto Repair
+    local cost = GetRepairAllCost()
+    if CanMerchantRepair() and Config.gear.autoRepair:GetEnable() and cost > 0 then
+        RepairAllItems()
+        self:_PrintMoney("You repaired your armor for %s", cost)
     end
+
+    -- Auto sell
+    if self.autoSell.needed then
+        self:_Sell(self.autoSell.items)
+        self:_PrintMoney("You sold your junk for %s", self.autoSell.totalSellPrice)
+    end
+
+    self:_Check()
 end
 
-function PreparationController:_SellItems(items)
+function PreparationController:_Sell(items)
     for bag = 0, NUM_BAG_SLOTS do
         local numSlots = GetContainerNumSlots(bag)
         if numSlots > 0 then
@@ -89,5 +161,24 @@ function PreparationController:_SellItems(items)
                 end
             end
         end
+    end
+end
+
+function PreparationController:_PrintMoney(pattern, value)
+    self:_Print(pattern, GetMoneyString(value, true), 'MONEY')
+end
+
+function PreparationController:_Print(pattern, value, channel)
+    local i = 1
+    local frame = _G['ChatFrame' .. i]
+    channel = 'CHAT_MSG_' .. channel
+
+    while frame do
+        if frame:IsEventRegistered(channel) then
+            ChatFrame_MessageEventHandler(frame, channel, pattern:format(value), '', nil, '')
+        end
+
+        i = i + 1
+        frame = _G['ChatFrame' .. i]
     end
 end
