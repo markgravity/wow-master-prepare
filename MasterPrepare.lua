@@ -4,11 +4,11 @@
 --- DateTime: 14/06/2021 11:22
 ---
 local Config = MasterPrepare.Config
-local BagJunkMarkerController = MasterPrepare.BagJunkMarkerController
+local BagController = MasterPrepare.BagController
 local SCRIPT_HANDLER = MasterCore.SCRIPT_HANDLER
-local NotPrepareDebuffButtonController = MasterPrepare.NotPrepareDebuffButtonController
-local NecessityActionButtonController = MasterPrepare.NecessityActionButtonController
-local NECESSITY_ITEM_TYPE = MasterPrepare.NECESSITY_ITEM_TYPE
+local DebuffButtonController = MasterPrepare.DebuffButtonController
+local ActionButtonController = MasterPrepare.ActionButtonController
+local FW_TYPE = MasterPrepare.FW_TYPE
 local AceEvent = LibStub("AceEvent-3.0")
 local MESSAGE = MasterPrepare.MESSAGE
 
@@ -17,19 +17,22 @@ function MasterPrepareAddon:OnInitialize()
     Config:Setup()
 
     local frame = CreateFrame("Frame")
-    local bagJunkMarkerController = BagJunkMarkerController:Init()
+    local bagController = BagController:Init()
     frame:SetScript(SCRIPT_HANDLER.ON_UPDATE, function()
-        bagJunkMarkerController:OnUpdate()
+        bagController:OnUpdate()
     end)
 
-    RegisterEventsForControllers(MasterPrepare.PreparationController:Init(),
-                                 NotPrepareDebuffButtonController:Init()
+    local debuffButtonController = DebuffButtonController:Init()
+    RegisterEventsForControllers(
+            MasterPrepare.PreparationController:Init(),
+            debuffButtonController
     )
 
-    local food = NecessityActionButtonController:Init(NECESSITY_ITEM_TYPE.FOOD)
-    local drink = NecessityActionButtonController:Init(NECESSITY_ITEM_TYPE.DRINK)
-    AceEvent:RegisterMessage(MESSAGE.PREPRATION_CHECKED, function(message, _, ...)
+    local food = ActionButtonController:Init(FW_TYPE.FOOD)
+    local water = ActionButtonController:Init(FW_TYPE.WATER)
+    AceEvent:RegisterMessage(MESSAGE.PREPRATION_CHECKED, function(message, isPrepared, ...)
         food:OnMessage(message, ...)
-        drink:OnMessage(message, ...)
+        water:OnMessage(message, ...)
+        debuffButtonController:OnMessage(message, isPrepared, ...)
     end)
 end

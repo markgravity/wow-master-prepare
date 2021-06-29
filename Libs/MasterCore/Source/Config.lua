@@ -3,6 +3,9 @@
 --- Created by markg.
 --- DateTime: 19/06/2021 08:44
 ---
+local AceEvent = LibStub("AceEvent-3.0")
+local MESSAGE = MasterCore.MESSAGE
+
 local Config, super = MasterCore.Class:Create("Config")
 MasterCore.Config = Config
 
@@ -30,9 +33,11 @@ function Config:_GetKey(info)
 
     return key
 end
-function Config:Set(info, value)
+function Config:Set(info, value, db)
+    db = db or self.db
     local key = self:_GetKey(info)
-    self.db[key] = value
+    db[key] = value
+    AceEvent:SendMessage(MESSAGE.CONFIG_UPDATED)
 end
 
 function Config:Get(info)

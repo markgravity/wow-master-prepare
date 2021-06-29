@@ -6,16 +6,16 @@
 local L = LibStub("AceLocale-3.0"):GetLocale(MASTER_PREPARE_NAME)
 local ITEM_QUALITY = MasterCore.ITEM_QUALITY
 
-local AutoSellConfig, super = MasterCore.Class:Create("AutoSellConfig", MasterCore.Config)
-MasterPrepare.AutoSellConfig = AutoSellConfig
+local GearSellConfig, super = MasterCore.Class:Create("GearSellConfig", MasterCore.Config)
+MasterPrepare.GearSellConfig = GearSellConfig
 
-function AutoSellConfig:Init(db, order)
+function GearSellConfig:Init(db, order)
     self = super.Init(self, db, order)
-    self.name = "Auto Sell"
+    self.name = "Sell"
     return self
 end
 
-function AutoSellConfig:GetOptions()
+function GearSellConfig:GetOptions()
     return {
         name = self.name,
         type = 'group',
@@ -55,22 +55,22 @@ function AutoSellConfig:GetOptions()
     }
 end
 
-function AutoSellConfig:GetEnable()
+function GearSellConfig:GetEnable()
     return self:Get("enable")
 end
 
-function AutoSellConfig:GetQualityThreshold()
+function GearSellConfig:GetQualityThreshold()
     return self:Get("qualityThreshold")
 end
 
-function AutoSellConfig:GetDefaults()
+function GearSellConfig:GetDefaults()
     return {
         enable = true,
         qualityThreshold = ITEM_QUALITY.POOR
     }
 end
 
-function AutoSellConfig:GetQualities()
+function GearSellConfig:GetQualities()
     return {
         [ITEM_QUALITY.POOR] = "|c"..GetItemQualityHexColor(ITEM_QUALITY.POOR).."Poor",
         [ITEM_QUALITY.COMMON] = "|c"..GetItemQualityHexColor(ITEM_QUALITY.COMMON).."Common",

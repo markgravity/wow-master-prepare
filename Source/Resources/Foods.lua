@@ -96,3 +96,15 @@ MasterPrepare.VENDOR_FOODS = {
     { id = 38428, effectValue = 7500, minLevel = 65 }, -- Rock-Salted Pretzel
     { id = 30355, effectValue = 7500, minLevel = 65 }, -- Grilled Shadowmoon Tuber
 }
+
+MasterPrepare.CONJURE_FOODS = {
+    { id = 5349, effectValue = 61.2, minLevel = 1 }, -- Conjured Muffin
+    { id = 1113, effectValue = 243.6, minLevel = 5 }, -- Conjured Bread
+    { id = 1114, effectValue = 552, minLevel = 15 }, -- Conjured Rye
+    { id = 1487, effectValue = 874.8, minLevel = 25 }, -- Conjured Pumpernickel
+    { id = 8075, effectValue = 1392, minLevel = 35 }, -- Conjured Sourdough
+    { id = 8076, effectValue = 2148, minLevel = 45 }, -- Conjured Sweet Roll
+    { id = 22895, effectValue = 4320, minLevel = 55 }, -- Conjured Cinnamon Roll
+    { id = 34062, effectValue = 7500, minLevel = 65 }, -- Conjured Manna Biscuit
+    { id = 22019, effectValue = 7500, minLevel = 65 }, -- Conjured Croissant
+}

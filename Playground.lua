@@ -41,7 +41,7 @@ makePrintString = function(value, indents, isKV)
     end
 
     local output = ""
-    local elIndents = indents .. "\t"
+    local elIndents = indents .. "   "
     if isKV then
         output = "{\n"
     else

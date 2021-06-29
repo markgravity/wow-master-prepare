@@ -3,15 +3,17 @@
 --- Created by markg.
 --- DateTime: 19/06/2021 18:42
 ---
-local NecessityItemPreparation = MasterPrepare.NecessityItemPreparation
-local NECESSITY_ITEM_TYPE = MasterPrepare.NECESSITY_ITEM_TYPE
+local FWService = MasterPrepare.FWService
+local FW_TYPE = MasterPrepare.FW_TYPE
 local EVENT = MasterCore.EVENT
 local AceEvent = LibStub("AceEvent-3.0")
 local MESSAGE = MasterPrepare.MESSAGE
 local Config = MasterPrepare.Config
-local GearAutoRepairPreparation = MasterPrepare.GearAutoRepairPreparation
-local GearAutoSellPreparation = MasterPrepare.GearAutoSellPreparation
+local GearRepairService = MasterPrepare.GearRepairService
+local GearSellService = MasterPrepare.GearSellService
 local Dialog = MasterCore.Dialog
+local ContainerItemInfo = MasterCore.ContainerItemInfo
+local ItemInfo = MasterCore.ItemInfo
 
 local PreparationController, super = MasterCore.Class:Create("PreparationController", MasterCore.EventController)
 MasterPrepare.PreparationController = PreparationController
@@ -25,11 +27,17 @@ function PreparationController:Init()
         EVENT.CONFIRM_SUMMON,
         EVENT.PLAYER_ENTERING_WORLD
     })
-    self.food = NecessityItemPreparation:Init(NECESSITY_ITEM_TYPE.FOOD)
-    self.drink = NecessityItemPreparation:Init(NECESSITY_ITEM_TYPE.DRINK)
-    self.autoRepair = GearAutoRepairPreparation:Init()
-    self.autoSell = GearAutoSellPreparation:Init()
+    self.food = FWService:Init(FW_TYPE.FOOD)
+    self.water = FWService:Init(FW_TYPE.WATER)
+    self.gearRepair = GearRepairService:Init()
+    self.gearSell = GearSellService:Init()
+    self.allJunkItems = {}
+    self.isChecking = false
 
+    -- Check when config is updated
+    AceEvent:RegisterMessage(MESSAGE.CONFIG_UPDATED, function()
+        self:_Check()
+    end)
     return self
 end
 
@@ -56,28 +64,39 @@ function PreparationController:OnEvent(event)
 end
 
 function PreparationController:_Check()
+    if self.isChecking then
+        return
+    end
+    self.isChecking = true
+
     local checkCount = 0
     local totalCheck = 4
+    local junkItems = {}
 
-    if Config.food:GetEnable() then
+    -- Food
+    if Config.food.buy:GetEnable() then
         if self.food:Check() then
             --print("food")
             checkCount = checkCount + 1
         end
+        table.merge(junkItems, self.food.junkItems)
     else
         checkCount = checkCount + 1
     end
 
-    if Config.drink:GetEnable() then
-        if self.drink:Check() then
+    -- Drink
+    if Config.water.buy:GetEnable() then
+        if self.water:Check() then
             checkCount = checkCount + 1
         end
+        table.merge(junkItems, self.water.junkItems)
     else
         checkCount = checkCount + 1
     end
 
-    if Config.gear.autoRepair:GetEnable() then
-        if self.autoRepair:Check() then
+    -- Repair
+    if Config.gear.repair:GetEnable() then
+        if self.gearRepair:Check() then
             --print("repair")
             checkCount = checkCount + 1
         end
@@ -85,46 +104,52 @@ function PreparationController:_Check()
         checkCount = checkCount + 1
     end
 
-    if Config.gear.autoSell:GetEnable() then
-        if self.autoSell:Check() then
+    -- Sell Junk
+    if Config.gear.sell:GetEnable() then
+        if self.gearSell:Check() then
             --print("sell")
             checkCount = checkCount + 1
         end
-        AceEvent:SendMessage(MESSAGE.JUNK_ITEMS_UPDATED, self.autoSell.items)
+        table.merge(junkItems, self.gearSell.items)
     else
         checkCount = checkCount + 1
     end
 
     --print(checkCount, totalCheck)
     local isPrepared = checkCount == totalCheck
-    AceEvent:SendMessage(MESSAGE.PREPRATION_CHECKED, isPrepared, self.food, self.drink, self.autoRepair, self.autoSell)
+    AceEvent:SendMessage(MESSAGE.PREPRATION_CHECKED, isPrepared, self.food, self.water, self.gearRepair, self.gearSell)
 
+    AceEvent:SendMessage(MESSAGE.JUNK_ITEMS_UPDATED, junkItems)
+    self.allJunkItems = junkItems
+
+    self.isChecking = false
     return isPrepared
 end
 
 function PreparationController:_Prepare()
     local numFoodNeeded = self.food.numberNeeded
-    local numDrinkNeeded = self.drink.numberNeeded
+    local numDrinkNeeded = self.water.numberNeeded
+    local totalSellPrice = 0
 
     -- Nothing to restock
     if numFoodNeeded + numDrinkNeeded <= 0 then
-        self:_Sell(self.food:GetJunks())
-        self:_Sell(self.drink:GetJunks())
+        totalSellPrice = totalSellPrice + self:_Sell(self.food.junkItems)
+        totalSellPrice = totalSellPrice + self:_Sell(self.water.junkItems)
     else
-        -- Buy foods or drinks from merchant, if it's available
+        -- Buy foods or waters from merchant, if it's available
         for i = 1, GetMerchantNumItems() do
             local itemLink = GetMerchantItemLink(i)
-            local itemId = GetItemID(itemLink)
-            if numFoodNeeded > 0 and self.food.suitableItems[itemId] ~= nil then
+            local itemID = GetItemID(itemLink)
+            if numFoodNeeded > 0 and self.food.suitableItems[itemID] ~= nil then
                 MassiveBuyMerchantItem(i, numFoodNeeded)
                 numFoodNeeded = 0
-                self:_Sell(self.food:GetJunks())
+                totalSellPrice = totalSellPrice + self:_Sell(self.food.junkItems)
             end
 
-            if numDrinkNeeded > 0 and self.drink.suitableItems[itemId] ~= nil then
+            if numDrinkNeeded > 0 and self.water.suitableItems[itemID] ~= nil then
                 MassiveBuyMerchantItem(i, numDrinkNeeded)
                 numDrinkNeeded = 0
-                self:_Sell(self.drink:GetJunks())
+                totalSellPrice = totalSellPrice + self:_Sell(self.water.junkItems)
             end
 
             -- All restock
@@ -136,32 +161,42 @@ function PreparationController:_Prepare()
 
     -- Auto Repair
     local cost = GetRepairAllCost()
-    if CanMerchantRepair() and Config.gear.autoRepair:GetEnable() and cost > 0 then
+    if CanMerchantRepair() and Config.gear.repair:GetEnable() and cost > 0 then
         RepairAllItems()
         self:_PrintMoney("You repaired your armor for %s", cost)
     end
 
-    -- Auto sell
-    if self.autoSell.needed then
-        self:_Sell(self.autoSell.items)
-        self:_PrintMoney("You sold your junk for %s", self.autoSell.totalSellPrice)
+    -- Gear sell
+    if self.gearSell.needed then
+        totalSellPrice = totalSellPrice + self:_Sell(self.gearSell.items)
+    end
+
+    -- Print out total sell price
+    if totalSellPrice > 0 then
+        self:_PrintMoney("You sold your junk for %s", totalSellPrice)
     end
 
     self:_Check()
 end
 
 function PreparationController:_Sell(items)
+    local totalSellPrice = 0
     for bag = 0, NUM_BAG_SLOTS do
         local numSlots = GetContainerNumSlots(bag)
         if numSlots > 0 then
             for slot = 1, numSlots do
+                local containerItemInfo = ContainerItemInfo:Init(bag, slot)
                 local itemID = GetContainerItemID(bag, slot)
-                if items[itemID] then
+                local item = ItemInfo:Init(itemID)
+                if item and items[itemID] then
+                    totalSellPrice = totalSellPrice + item.sellPrice * containerItemInfo.itemCount
                     SellContainerItemToMerchant(bag, slot)
                 end
             end
         end
     end
+
+    return totalSellPrice
 end
 
 function PreparationController:_PrintMoney(pattern, value)

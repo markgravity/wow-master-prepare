@@ -5,16 +5,16 @@
 ---
 local L = LibStub("AceLocale-3.0"):GetLocale(MASTER_PREPARE_NAME)
 
-local AutoRepairConfig, super = MasterCore.Class:Create("AutoRepairConfig", MasterCore.Config)
-MasterPrepare.AutoRepairConfig = AutoRepairConfig
+local GearRepairConfig, super = MasterCore.Class:Create("GearRepairConfig", MasterCore.Config)
+MasterPrepare.GearRepairConfig = GearRepairConfig
 
-function AutoRepairConfig:Init(db, order)
+function GearRepairConfig:Init(db, order)
     self = super.Init(self, db, order)
-    self.name = "Auto Repair"
+    self.name = "Repair"
     return self
 end
 
-function AutoRepairConfig:GetOptions()
+function GearRepairConfig:GetOptions()
     return {
         name = self.name,
         type = 'group',
@@ -70,20 +70,20 @@ function AutoRepairConfig:GetOptions()
     }
 end
 
-function AutoRepairConfig:GetEnable()
+function GearRepairConfig:GetEnable()
     return self:Get("enable")
 end
 
-function AutoRepairConfig:GetMinDurability()
+function GearRepairConfig:GetMinDurability()
     return self:Get("minDurability")
 end
 
-function AutoRepairConfig:GetWarningInventoryOnly()
+function GearRepairConfig:GetWarningInventoryOnly()
     return self:Get("warningInventoryOnly")
 end
 
 
-function AutoRepairConfig:GetDefaults()
+function GearRepairConfig:GetDefaults()
     return {
         enable = true,
         minDurability = 50,

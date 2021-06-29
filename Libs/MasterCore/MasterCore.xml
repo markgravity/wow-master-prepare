@@ -1,6 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
+    <Include file="Libs\Ace3\AceEvent-3.0\AceEvent-3.0.xml"/>
     <Script file="Source\Init.lua"/>
+    <Script file="Source\Table.lua"/>
     <Script file="Source\Api.lua"/>
     <Script file="Source\Print.lua"/>
     <Script file="Source\Class.lua"/>

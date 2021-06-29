@@ -4,39 +4,31 @@
 --- DateTime: 18/06/2021 21:22
 ---
 local L = LibStub("AceLocale-3.0"):GetLocale(MASTER_PREPARE_NAME)
-local FOOD_AND_DRINK_CONFIG_TYPE = {
+
+local FW_TYPE = {
     FOOD = "food",
-    DRINK = "drink"
+    WATER = "water"
 }
-MasterPrepare.FOOD_AND_DRINK_CONFIG_TYPE = FOOD_AND_DRINK_CONFIG_TYPE
+MasterPrepare.FW_TYPE = FW_TYPE
 
-local FoodAndDrinkConfig, super = MasterCore.Class:Create("FoodAndDrinkConfig", MasterCore.Config)
-MasterPrepare.FoodAndDrinkConfig = FoodAndDrinkConfig
-function FoodAndDrinkConfig:Init(type, db, order)
-    self = super.Init(self, db[type])
+local FWBuyConfig, super = MasterCore.Class:Create("FWBuyConfig", MasterCore.Config)
+MasterPrepare.FWBuyConfig = FWBuyConfig
+function FWBuyConfig:Init(type, db, order)
+    self = super.Init(self, db, order)
     self.type = type
-    self.order = order
-
-    if self.type == FOOD_AND_DRINK_CONFIG_TYPE.FOOD then
-        self.name = L["Food"]
-    end
-
-    if self.type == FOOD_AND_DRINK_CONFIG_TYPE.DRINK then
-        self.name = L["Drink"]
-    end
-
+    self.name = "Buy"
     return self
 end
 
-function FoodAndDrinkConfig:GetOptions()
+function FWBuyConfig:GetOptions()
     local itemName, stat
-    if self.type == FOOD_AND_DRINK_CONFIG_TYPE.FOOD then
+    if self.type == FW_TYPE.FOOD then
         itemName = "food"
         stat = "Health Point"
     end
 
-    if self.type == FOOD_AND_DRINK_CONFIG_TYPE.DRINK then
-        itemName = "drink"
+    if self.type == FW_TYPE.WATER then
+        itemName = "water"
         stat = "Mana Point"
     end
 
@@ -46,16 +38,10 @@ function FoodAndDrinkConfig:GetOptions()
         handler = self,
         order = self.order,
         args = {
-            intro = {
-                order = self:_AutoIncrementOrder(true),
-                type = "description",
-                name = "Auto find the most suitable " .. itemName .. " and buy from vendor\n\n",
-                width = "full"
-            },
             enable = {
-                order = self:_AutoIncrementOrder(),
+                order = self:_AutoIncrementOrder(true),
                 type = "toggle",
-                name = "Enable",
+                name = "Buy " .. itemName .. " automatically",
                 width = "full",
                 set = "Set",
                 get = "GetEnable"
@@ -111,43 +97,6 @@ function FoodAndDrinkConfig:GetOptions()
                     return not self.db.enable
                 end
             },
-            sellJunks = {
-                order = self:_AutoIncrementOrder(),
-                type = "toggle",
-                name = "Sell junks",
-                desc = "Sell all " .. itemName .. "s which has restore value less than the most suitable " .. itemName,
-                set = "Set",
-                get = "GetSellJunks",
-                disabled = function()
-                    return not self.db.enable
-                end
-            },
-            actionBarKey = {
-                order = self:_AutoIncrementOrder(),
-                type = "keybinding",
-                name = "Action Bar Key",
-                desc = "Set action bar slot to auto swap " .. itemName .. "s in this character's bag to this slot",
-                validate = function(_, value)
-                    if GetActionSlot(value) == nil then
-                        return "This key is not binded to any Action Button yet!"
-                    end
-
-                    return true
-                end,
-                set = "Set",
-                get = "GetActionBarKey",
-            },
-            con = {
-                order = self:_AutoIncrementOrder(),
-                type = "toggle",
-                name = "Prefer conj",
-                desc = "Sell all " .. itemName .. "s which has restore value less than the most suitable " .. itemName,
-                set = "Set",
-                get = "GetSellJunks",
-                disabled = function()
-                    return not self.db.enable
-                end
-            },
             header = {
                 order = self:_AutoIncrementOrder(),
                 type = "header",
@@ -156,7 +105,7 @@ function FoodAndDrinkConfig:GetOptions()
             info = {
                 order = self:_AutoIncrementOrder(),
                 type = "description",
-                name = "The addon will find the most suitable " .. itemName .. " base on these criteria",
+                name = "The criteria to find the most suitable " .. itemName,
                 width = "full"
             },
             usable = {
@@ -180,83 +129,57 @@ function FoodAndDrinkConfig:GetOptions()
                 disabled = function()
                     return not self.db.enable
                 end
-            },
-            saveBagSpace = {
-                order = self:_AutoIncrementOrder(),
-                type = "toggle",
-                name = "Save bag space",
-                desc = "Sell and replace un-full stack " .. itemName .. "s that has the same restore value with the most suitable " .. itemName,
-                set = "SetCriteria",
-                get = "GetCriteriaSaveBagSpace",
-                disabled = function()
-                    return not self.db.enable
-                end
-            },
+            }
         }
     }
 end
 
-function FoodAndDrinkConfig:GetEnable()
+function FWBuyConfig:GetEnable()
     return self:Get("enable")
 end
 
-function FoodAndDrinkConfig:GetMinRestock()
+function FWBuyConfig:GetMinRestock()
     return self:Get("minRestock")
 end
 
-function FoodAndDrinkConfig:GetMaxRestock()
+function FWBuyConfig:GetMaxRestock()
     return self:Get("maxRestock")
 end
 
-function FoodAndDrinkConfig:GetAlwaysRestock()
+function FWBuyConfig:GetAlwaysRestock()
     return self:Get("alwaysRestock")
 end
 
-function FoodAndDrinkConfig:GetSellJunks()
-    return self:Get("sellJunks")
+function FWBuyConfig:SetCriteria(info, value)
+    self:Set(info, value, self.db.criteria)
 end
 
-function FoodAndDrinkConfig:GetActionBarKey()
-    return self:Get("actionBarKey")
-end
-
-function FoodAndDrinkConfig:SetCriteria(info, value)
-    local key = self:_GetKey(info)
-    self.db.criteria[key] = value
-end
-
-function FoodAndDrinkConfig:GetCriteria(info)
+function FWBuyConfig:GetCriteria(info)
     local key = self:_GetKey(info)
     return self.db.criteria[key]
 end
 
-function FoodAndDrinkConfig:GetCriteriaUsable()
+function FWBuyConfig:GetCriteriaUsable()
     return self:GetCriteria("usable")
 end
 
-function FoodAndDrinkConfig:GetCriteriaMostValue()
+function FWBuyConfig:GetCriteriaMostValue()
     return self:GetCriteria("mostValue")
 end
 
-function FoodAndDrinkConfig:GetCriteriaSaveBagSpace()
-    return self:GetCriteria("saveBagSpace")
-end
-
-function FoodAndDrinkConfig:GetAllCriteria()
+function FWBuyConfig:GetAllCriteria()
     return self.db.criteria
 end
 
-function FoodAndDrinkConfig:GetDefaults()
+function FWBuyConfig:GetDefaults()
     return {
         enable = true,
         minRestock = 20,
         maxRestock = 30,
         alwaysRestock = true,
-        sellJunks = true,
         criteria = {
             usable = true,
             mostValue = false,
-            saveBagSpace = false,
         }
     }
 end

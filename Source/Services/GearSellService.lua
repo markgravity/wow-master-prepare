@@ -9,18 +9,24 @@ local Config = MasterPrepare.Config
 local ITEM_TYPE = MasterCore.ITEM_TYPE
 local ITEM_QUALITY = MasterCore.ITEM_QUALITY
 
-local GearAutoSellPreparation, _ = MasterCore.Class:Create("GearPreparation")
-MasterPrepare.GearAutoSellPreparation = GearAutoSellPreparation
+local GearSellService, super = MasterCore.Class:Create("GearSellService")
+MasterPrepare.GearSellService = GearSellService
 
-function GearAutoSellPreparation:Check()
-    self.items, self.totalSellPrice, self.count = self:_GetJunkItemsInBags()
+function GearSellService:Init()
+    self = super.Init(self)
+    self.items = {}
+    self.count = 0
+    self.needed = false
+    return self
+end
+function GearSellService:Check()
+    self.items, self.count = self:_GetJunkItemsInBags()
     self.needed = self.count > 0
     return not self.needed
 end
 
-function GearAutoSellPreparation:_GetJunkItemsInBags()
+function GearSellService:_GetJunkItemsInBags()
     local junkItems = {}
-    local totalSellPrice = 0
     local count = 0
     for bag = 0, NUM_BAG_SLOTS do
         local numSlots = GetContainerNumSlots(bag)
@@ -29,12 +35,11 @@ function GearAutoSellPreparation:_GetJunkItemsInBags()
                 local containerItemInfo = ContainerItemInfo:Init(bag, slot)
 
                 -- Checking item quality threshold
-                if containerItemInfo.quality and containerItemInfo.quality <= Config.gear.autoSell:GetQualityThreshold() then
+                if containerItemInfo.quality and containerItemInfo.quality <= Config.gear.sell:GetQualityThreshold() then
                     local itemID = GetContainerItemID(bag, slot)
                     local item = ItemInfo:Init(itemID)
 
                     if itemID and self:_IsSellable(item, containerItemInfo.quality) then
-                        totalSellPrice = totalSellPrice + item.sellPrice
                         junkItems[itemID] = true
                         count = count + 1
                     end
@@ -43,10 +48,10 @@ function GearAutoSellPreparation:_GetJunkItemsInBags()
         end
     end
 
-    return junkItems, totalSellPrice, count
+    return junkItems, count
 end
 
-function GearAutoSellPreparation:_IsSellable(item, quality)
+function GearSellService:_IsSellable(item, quality)
     if item.sellPrice == nil or item.sellPrice == 0 then
         return false
     end

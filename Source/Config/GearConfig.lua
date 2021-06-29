@@ -3,8 +3,8 @@
 --- Created by markg.
 --- DateTime: 20/06/2021 14:50
 ---
-local AutoRepairConfig = MasterPrepare.AutoRepairConfig
-local AutoSellConfig = MasterPrepare.AutoSellConfig
+local GearRepairConfig = MasterPrepare.GearRepairConfig
+local GearSellConfig = MasterPrepare.GearSellConfig
 
 local GearConfig, super = MasterCore.Class:Create("GearConfig", MasterCore.Config)
 MasterPrepare.GearConfig = GearConfig
@@ -12,8 +12,8 @@ MasterPrepare.GearConfig = GearConfig
 function GearConfig:Init(db, order)
     self = super.Init(self, db, order)
     self.name = "Gear"
-    self.autoRepair = AutoRepairConfig:Init(self.db.autoRepair, 1)
-    self.autoSell = AutoSellConfig:Init(self.db.autoSell, 2)
+    self.repair = GearRepairConfig:Init(self.db.repair, 1)
+    self.sell = GearSellConfig:Init(self.db.sell, 2)
     return self
 end
 
@@ -25,15 +25,15 @@ function GearConfig:GetOptions()
         handler = self,
         order = self.order,
         args = {
-            autoRepair = self.autoRepair:GetOptions(),
-            autoSell = self.autoSell:GetOptions()
+            repair = self.repair:GetOptions(),
+            sell = self.sell:GetOptions()
         }
     }
 end
 
 function GearConfig:GetDefaults()
     return {
-        autoRepair = AutoRepairConfig:GetDefaults(),
-        autoSell = AutoSellConfig:GetDefaults(),
+        repair = GearRepairConfig:GetDefaults(),
+        sell = GearSellConfig:GetDefaults(),
     }
 end

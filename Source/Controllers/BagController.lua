@@ -7,17 +7,19 @@ local BAG_PROVIDERS = MasterPrepare.BAG_PROVIDERS
 local AceEvent = LibStub("AceEvent-3.0")
 local MESSAGE = MasterPrepare.MESSAGE
 local POINT = MasterCore.POINT
+local SCRIPT_HANDLER = MasterCore.SCRIPT_HANDLER
 
 local SHOWING_MARKERS_STATUS = {
     READY = 1,
     IN_PROGRESS = 2,
     DONE = 3
 }
-local BagJunkMarkerController, super = MasterCore.Class:Create("BagJunkMarkerController")
-MasterPrepare.BagJunkMarkerController = BagJunkMarkerController
+local BagController, super = MasterCore.Class:Create("BagController")
+MasterPrepare.BagController = BagController
 
-function BagJunkMarkerController:Init()
+function BagController:Init()
     self = super.Init(self)
+
     self.bagProviders = self:_GetBagProviders()
     self.showingMarkersStatus = SHOWING_MARKERS_STATUS.DONE
     self.junkItems = {}
@@ -30,35 +32,43 @@ function BagJunkMarkerController:Init()
     return self
 end
 
-function BagJunkMarkerController:OnUpdate()
+function BagController:OnUpdate()
     if self.showingMarkersStatus == SHOWING_MARKERS_STATUS.READY then
         self:_ShowMarkers()
     end
 end
-function BagJunkMarkerController:_ShowMarkers()
+function BagController:_ShowMarkers()
     self.showingMarkersStatus = SHOWING_MARKERS_STATUS.IN_PROGRESS
     for itemID, _ in pairs(self.junkItems) do
         for _, provider in ipairs(self.bagProviders) do
             local buttons = provider:GetButtons()
-
-            if buttons[itemID] then
-                self:_ShowMarker(buttons[itemID])
-                table.insert(self.markedButtons, buttons[itemID])
-            else
-                -- Stop when can't find item button
-                -- and keep refresh until all item buttons available
-                -- to mark
+            if #buttons == 0 then
                 self.showingMarkersStatus = SHOWING_MARKERS_STATUS.READY
                 return
             end
 
+            -- Get button by item id and show marker
+            local found = false
+            for _, button in ipairs(buttons) do
+                if button.itemID == itemID then
+                    found = true
+                    self:_ShowMarker(button.frame)
+                    table.insert(self.markedButtons, button.frame)
+                end
+            end
+
+            -- Stop whenever an item can't find a button in bags
+            if not found then
+                self.showingMarkersStatus = SHOWING_MARKERS_STATUS.READY
+                return
+            end
         end
     end
 
     self.showingMarkersStatus = SHOWING_MARKERS_STATUS.DONE
 end
 
-function BagJunkMarkerController:_ShowMarker(button)
+function BagController:_ShowMarker(button)
     if not button.junkMarkerIcon then
         local icon = button:CreateTexture(nil, 'OVERLAY')
         icon:SetTexture('Interface/Buttons/UI-GroupLoot-Coin-Up')
@@ -70,7 +80,7 @@ function BagJunkMarkerController:_ShowMarker(button)
     button.junkMarkerIcon:Show()
 end
 
-function BagJunkMarkerController:_HideAllMarkers()
+function BagController:_HideAllMarkers()
     for _, button in ipairs(self.markedButtons) do
         if button.junkMarkerIcon then
             button.junkMarkerIcon:Hide()
@@ -79,7 +89,7 @@ function BagJunkMarkerController:_HideAllMarkers()
     self.markedButtons = {}
 end
 
-function BagJunkMarkerController:_GetBagProviders()
+function BagController:_GetBagProviders()
     local providers = {}
     for _, provider in pairs(BAG_PROVIDERS) do
         if provider:IsEnabled() then

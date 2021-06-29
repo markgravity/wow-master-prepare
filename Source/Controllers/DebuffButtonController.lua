@@ -10,38 +10,40 @@ local SCRIPT_HANDLER = MasterCore.SCRIPT_HANDLER
 local FRAME_TYPE = MasterCore.FRAME_TYPE
 local FRAME_TEMPLATE = MasterCore.FRAME_TEMPLATE
 
-local NotPrepareDebuffButtonController, super = MasterCore.Class:Create("NotPrepareDebuffButtonController", MasterCore.EventController)
-MasterPrepare.NotPrepareDebuffButtonController = NotPrepareDebuffButtonController
+local DebuffButtonController, super = MasterCore.Class:Create("DebuffButtonController", MasterCore.EventController)
+MasterPrepare.DebuffButtonController = DebuffButtonController
 
-function NotPrepareDebuffButtonController:Init()
+function DebuffButtonController:Init()
     self = super.Init(self, {
         EVENT.UNIT_AURA
     })
-    self.isPrepared = true
-    AceEvent:RegisterMessage(MESSAGE.PREPRATION_CHECKED, function(_, isPrepared, food, drink, autoRepair, autoSell)
-        if self.debuffButtonIndex then
-            local button = _G["DebuffButton" .. self.debuffButtonIndex]
-            button:Hide()
-        end
 
-        self.isPrepared = isPrepared
-        self.food = food
-        self.drink = drink
-        self.autoRepair = autoRepair
-        self.autoSell = autoSell
-        self.debuffButtonIndex = nil
-        self:Show()
-    end)
+    self.isPrepared = true
     return self
 end
 
-function NotPrepareDebuffButtonController:OnEvent(event)
+function DebuffButtonController:OnEvent(event)
     if event == EVENT.UNIT_AURA then
         self:Show()
     end
 end
 
-function NotPrepareDebuffButtonController:Show()
+function DebuffButtonController:OnMessage(message, isPrepared, food, water, repair, sell)
+    if self.debuffButtonIndex then
+        local button = _G["DebuffButton" .. self.debuffButtonIndex]
+        button:Hide()
+    end
+
+    self.isPrepared = isPrepared
+    self.food = food
+    self.water = water
+    self.repair = repair
+    self.sell = sell
+    self.debuffButtonIndex = nil
+    self:Show()
+end
+
+function DebuffButtonController:Show()
     local buttonName = "DebuffButton"
 
     if not IsResting() or self.isPrepared then
@@ -86,7 +88,7 @@ function NotPrepareDebuffButtonController:Show()
     icon:SetTexture("Interface/ICONS/INV_Misc_Bag_19");
 end
 
-function NotPrepareDebuffButtonController:ShowTootip(button)
+function DebuffButtonController:ShowTootip(button)
     GameTooltip:Hide()
     GameTooltip:ClearLines()
     GameTooltip:SetOwner(button, "ANCHOR_BOTTOMLEFT")
@@ -96,16 +98,16 @@ function NotPrepareDebuffButtonController:ShowTootip(button)
         GameTooltip:AddLine("Food is missed by " .. self.food.numberNeeded, 1, 1, 1)
     end
 
-    if self.drink.numberNeeded > 0 then
-        GameTooltip:AddLine("Drink is missed by " .. self.drink.numberNeeded, 1, 1, 1)
+    if self.water.numberNeeded > 0 then
+        GameTooltip:AddLine("Drink is missed by " .. self.water.numberNeeded, 1, 1, 1)
     end
 
-    if self.autoRepair.needed then
-        GameTooltip:AddLine("Armor Durability is loss by " .. 100 - self.autoRepair.overollDurability .. "%", 1, 1, 1)
+    if self.repair.needed then
+        GameTooltip:AddLine("Armor Durability is loss by " .. 100 - self.repair.overollDurability .. "%", 1, 1, 1)
     end
 
-    if self.autoSell.needed then
-        GameTooltip:AddLine("Bags are junk filled by " .. self.autoSell.count .. ".", 1, 1, 1)
+    if self.sell.needed then
+        GameTooltip:AddLine("Bags are junk filled by " .. self.sell.count .. ".", 1, 1, 1)
     end
 
     GameTooltip:Show()

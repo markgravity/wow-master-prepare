@@ -9,5 +9,6 @@ MasterPrepare = {}
 
 MasterPrepare.MESSAGE = {
     JUNK_ITEMS_UPDATED = "JUNK_ITEMS_UPDATED",
-    PREPRATION_CHECKED = "PREPRATION_CHECKED"
+    PREPRATION_CHECKED = "PREPRATION_CHECKED",
 }
+MasterPrepare.MESSAGE = table.merge(MasterCore.MESSAGE, MasterPrepare.MESSAGE)

@@ -6,24 +6,31 @@
 local INVENTORY_SLOT_NAME = MasterCore.INVENTORY_SLOT_NAME
 local Config = MasterPrepare.Config
 
-local GearAutoRepairPreparation, _ = MasterCore.Class:Create("GearPreparation")
-MasterPrepare.GearAutoRepairPreparation = GearAutoRepairPreparation
+local GearRepairService, super = MasterCore.Class:Create("GearRepairService")
+MasterPrepare.GearRepairService = GearRepairService
 
-function GearAutoRepairPreparation:Check()
-    self.overollInventoryItems = self:_GetOverallInventoryItemsDurability()
-    self.overallBagItemsDurability = self:_GetOverallBagItemsDurability()
-
-    local overollDurability = self.overollInventoryItems
-    if not Config.gear.autoRepair:GetWarningInventoryOnly() then
-        overollDurability = (overollDurability + self.overallBagItemsDurability) / 2
-    end
-
-    self.needed = overollDurability <= Config.gear.autoRepair:GetMinDurability()
-    self.overollDurability = math.floor(overollDurability)
-    return not self.needed
+function GearRepairService:Init()
+    self = super.Init(self)
+    self.needed = false
+    self.overollDurability = 100
+    return self
 end
 
-function GearAutoRepairPreparation:_GetOverallBagItemsDurability()
+function GearRepairService:Check()
+    local overollInventoryItems = self:_GetOverallInventoryItemsDurability()
+    local overallBagItemsDurability = self:_GetOverallBagItemsDurability()
+
+    local overollDurability = overollInventoryItems
+    if not Config.gear.repair:GetWarningInventoryOnly() then
+        overollDurability = (overollDurability + overallBagItemsDurability) / 2
+    end
+
+    self.needed = overollDurability <= Config.gear.repair:GetMinDurability()
+    self.overollDurability = math.floor(overollDurability)
+    return not self.needed, self.overollDurability
+end
+
+function GearRepairService:_GetOverallBagItemsDurability()
     local durabilityPercent = 0
     local durabilityCount = 0
     for bag = 0, NUM_BAG_SLOTS do
@@ -48,7 +55,7 @@ function GearAutoRepairPreparation:_GetOverallBagItemsDurability()
     return  durabilityPercent / durabilityCount
 end
 
-function GearAutoRepairPreparation:_GetOverallInventoryItemsDurability()
+function GearRepairService:_GetOverallInventoryItemsDurability()
     local durabilityPercent = 0
     local durabilityCount = 0
     local slotNames = {

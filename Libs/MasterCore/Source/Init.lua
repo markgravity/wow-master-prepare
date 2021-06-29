@@ -4,3 +4,7 @@
 --- DateTime: 17/06/2021 17:41
 ---
 MasterCore = {}
+
+MasterCore.MESSAGE = {
+    CONFIG_UPDATED = "CONFIG_UPDATED"
+}

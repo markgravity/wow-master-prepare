@@ -13,7 +13,7 @@ function CombuctorBagProvider:IsEnabled()
 end
 
 function CombuctorBagProvider:GetButtons()
-    local map = {}
+    local buttons = {}
     for bagNumber = 0, NUM_BAG_SLOTS do
         for slotNumber = 1, 36 do
             local itemButton = _G["ContainerFrame" .. bagNumber + 1 .. "Item" .. slotNumber]
@@ -23,15 +23,19 @@ function CombuctorBagProvider:GetButtons()
                 local bag = itemButtonParent:GetID()
                 local slot = itemButton:GetID()
                 local itemLink = GetContainerItemLink(bag, slot)
+
                 local itemID = GetItemID(itemLink)
                 if itemID then
-                    map[itemID] = itemButton
+                    table.insert(buttons, {
+                        itemID = itemID,
+                        frame = itemButton
+                    })
                 end
             end
         end
     end
 
-    return map
+    return buttons
 end
 
 BAG_PROVIDERS["Combuctor"] = CombuctorBagProvider:Init()
