@@ -30,9 +30,13 @@ function MasterPrepareAddon:OnInitialize()
 
     local food = ActionButtonController:Init(FW_TYPE.FOOD)
     local water = ActionButtonController:Init(FW_TYPE.WATER)
+    local healing = ActionButtonController:Init(FW_TYPE.HEALING_POTION)
+    local mana = ActionButtonController:Init(FW_TYPE.MANA_POTION)
     AceEvent:RegisterMessage(MESSAGE.PREPRATION_CHECKED, function(message, isPrepared, ...)
         food:OnMessage(message, ...)
         water:OnMessage(message, ...)
+        healing:OnMessage(message, ...)
+        mana:OnMessage(message, ...)
         debuffButtonController:OnMessage(message, isPrepared, ...)
     end)
 end

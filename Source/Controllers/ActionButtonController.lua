@@ -8,6 +8,7 @@ local ContainerItemInfo = MasterCore.ContainerItemInfo
 local Config = MasterPrepare.Config
 local FW_TYPE = MasterPrepare.FW_TYPE
 local MESSAGE = MasterPrepare.MESSAGE
+local FWSerivce = MasterPrepare.FWService
 
 local ActionButtonController, super = MasterCore.Class:Create("ActionButtonController", MasterCore.EventController)
 MasterPrepare.ActionButtonController = ActionButtonController
@@ -33,12 +34,30 @@ function ActionButtonController:OnMessage(message, food, water)
             self.config = Config.water.actionButton
         end
 
+        if self.type == FW_TYPE.HEALING_POTION then
+            self.prepration = FWSerivce:Init(FW_TYPE.HEALING_POTION)
+            self.config = Config.potion.healing.actionButton
+        end
+
+        if self.type == FW_TYPE.MANA_POTION then
+            self.prepration = FWSerivce:Init(FW_TYPE.MANA_POTION)
+            self.config = Config.potion.mana.actionButton
+        end
+
         self:_Check()
     end
 end
 function ActionButtonController:_Check()
     local key = self.config:GetKey()
+    if key == nil then
+        return
+    end
+
     local actionSlot = GetActionSlot(key)
+    if not actionSlot then
+        return
+    end
+
     local _, itemID = GetActionInfo(actionSlot)
 
     if self.actionItem == nil then
@@ -56,16 +75,17 @@ function ActionButtonController:_Check()
     end
 
     -- Stop when action item still in stock
-    local containerItemInfo = ContainerItemInfo:Init(self.actionItem.bag, self.actionItem.slot)
-    if containerItemInfo.itemCount ~= nil and containerItemInfo.itemCount > 0 then
+    -- Find a item to use
+    local newActionItem = self.prepration:FindItemToUse()
+    if newActionItem.id == self.actionItem.id then
         return
     end
 
-    -- Find a new one when the previous is out of stock
-    self.actionItem = self.prepration:FindItemToUse()
+    self.actionItem = newActionItem
+    if self.actionItem then
+        self:_Swap(self.actionItem, actionSlot)
+    end
 
-    --print("Swap")
-    self:_Swap(self.actionItem, actionSlot)
 end
 
 function ActionButtonController:_Swap(item, actionSlot)

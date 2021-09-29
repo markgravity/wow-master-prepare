@@ -11,6 +11,8 @@ local VENDOR_FOODS = MasterPrepare.VENDOR_FOODS
 local VENDOR_WATERS = MasterPrepare.VENDOR_WATERS
 local CONJURE_FOODS = MasterPrepare.CONJURE_FOODS
 local CONJURE_WATERS = MasterPrepare.CONJURE_WATERS
+local HEALING_POTIONS = MasterPrepare.HEALING_POTIONS
+local MANA_POTIONS = MasterPrepare.MANA_POTIONS
 local FW_TYPE = MasterPrepare.FW_TYPE
 local ItemInfo = MasterCore.ItemInfo
 local PREFER_CONJURE_TYPE = MasterPrepare.PREFER_CONJURE_TYPE
@@ -193,13 +195,14 @@ function FWService:_GetTotalQuantityInBags(items)
 end
 
 function FWService:FindItemToUse()
-    local suitableItems = self.suitableItems
-    local suitableConjures = self:_FindMostSuitableConjures()
+    local usableItems = self:_GetUsableItems(self:_GetItems())
+    local usableConjures = self:_GetUsableItems(self:_GetConjures())
     local config = self:_GetConfig().actionButton
 
     -- Get suitable items information in bags
     local items = {}
     local conjureItems = {}
+
     for bag = 0, NUM_BAG_SLOTS do
         local numSlots = GetContainerNumSlots(bag)
         if numSlots > 0 then
@@ -207,13 +210,13 @@ function FWService:FindItemToUse()
                 local containerItemInfo = ContainerItemInfo:Init(bag, slot)
                 local itemID = GetItemID(containerItemInfo.itemLink)
 
-                if itemID and (suitableItems[itemID] ~= nil or suitableConjures[itemID] ~= nil) then
+                if itemID and (usableItems[itemID] ~= nil or usableConjures[itemID] ~= nil) then
                     local objects = items
-                    local item = suitableItems[itemID]
+                    local item = usableItems[itemID]
 
-                    if suitableConjures[itemID] ~= nil then
+                    if usableConjures[itemID] ~= nil then
                         objects = conjureItems
-                        item = suitableConjures[itemID]
+                        item = usableConjures[itemID]
                     end
 
                     if objects[itemID] == nil then
@@ -231,13 +234,16 @@ function FWService:FindItemToUse()
         end
     end
 
-    local preferConjure = config:GetPreferConjure()
-    if preferConjure == PREFER_CONJURE_TYPE.ALWAYS and not table.isEmpty(conjureItems) then
-        return self:_FindBestItem(conjureItems)
-    end
+    -- Find best confure item if they're available in bags
+    if not table.isEmpty(conjureItems) then
+        local preferConjure = config:GetPreferConjure()
+        if preferConjure == PREFER_CONJURE_TYPE.ALWAYS  then
+            return self:_FindBestItem(conjureItems)
+        end
 
-    if preferConjure == PREFER_CONJURE_TYPE.BETTER then
-         table.merge(items, conjureItems)
+        if preferConjure == PREFER_CONJURE_TYPE.BETTER then
+            items = table.merge(items, conjureItems)
+        end
     end
 
     return self:_FindBestItem(items)
@@ -255,7 +261,6 @@ function FWService:_FindBestItem(items)
             end
         end
     end
-
     return bestItem
 end
 
@@ -267,6 +272,14 @@ function FWService:_GetConfig()
     if self.type == FW_TYPE.WATER then
         return Config.water
     end
+
+    if self.type == FW_TYPE.HEALING_POTION then
+        return Config.potion.healing
+    end
+
+    if self.type == FW_TYPE.MANA_POTION then
+        return Config.potion.mana
+    end
 end
 
 function FWService:_GetItems()
@@ -276,6 +289,14 @@ function FWService:_GetItems()
 
     if self.type == FW_TYPE.WATER then
         return VENDOR_WATERS
+    end
+
+    if self.type == FW_TYPE.HEALING_POTION then
+        return HEALING_POTIONS
+    end
+
+    if self.type == FW_TYPE.MANA_POTION then
+        return MANA_POTIONS
     end
 end
 
@@ -289,25 +310,27 @@ function FWService:_GetPlayerStat()
     end
 end
 
-function FWService:_FindMostSuitableConjures()
-    local items = {}
+function FWService:_GetUsableItems(items)
     local playerLevel = UnitLevel(UNIT.PLAYER)
-    local suitableItems = {}
-
-    if self.type == FW_TYPE.FOOD then
-        items = CONJURE_FOODS
-    end
-
-    if self.type == FW_TYPE.WATER then
-        items = CONJURE_WATERS
-    end
-
+    local usableItems = {}
 
     for _, item in ipairs(items) do
         if item.minLevel <= playerLevel then
-            suitableItems[item.id] = item
+            usableItems[item.id] = item
         end
     end
 
-    return suitableItems
+    return usableItems
+end
+
+function FWService:_GetConjures()
+    if self.type == FW_TYPE.FOOD then
+        return CONJURE_FOODS
+    end
+
+    if self.type == FW_TYPE.WATER then
+        return CONJURE_WATERS
+    end
+
+    return {}
 end

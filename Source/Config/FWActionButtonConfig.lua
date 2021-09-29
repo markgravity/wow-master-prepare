@@ -18,21 +18,42 @@ MasterPrepare.FWActionButtonConfig = FWActionButtonConfig
 function FWActionButtonConfig:Init(type, db, order)
     self = super.Init(self, db, order)
     self.type = type
-    self.name = "Action Button"
+
+
+    if type == FW_TYPE.WATER or type == FW_TYPE.FOOD then
+        self.name = "Action Button"
+    end
+
+    if type == FW_TYPE.HEALING_POTION then
+        self.name = "Healing"
+    end
+
+    if type == FW_TYPE.MANA_POTION then
+        self.name = "Mana"
+    end
+
     return self
 end
 
 function FWActionButtonConfig:GetOptions()
     local itemName
     if self.type == FW_TYPE.FOOD then
-        itemName = "food"
+        itemName = "Food"
     end
 
     if self.type == FW_TYPE.WATER then
-        itemName = "water"
+        itemName = "Water"
     end
 
-    return {
+    if self.type == FW_TYPE.HEALING_POTION then
+        itemName = "Healing Potion"
+    end
+
+    if self.type == FW_TYPE.MANA_POTION then
+        itemName = "Mana Potion"
+    end
+
+    local options = {
         name = self.name,
         type = 'group',
         handler = self,
@@ -41,7 +62,7 @@ function FWActionButtonConfig:GetOptions()
             enable = {
                 order = self:_AutoIncrementOrder(true),
                 type = "toggle",
-                name = "Put the " .. itemName .. " to selected Action Button automatically",
+                name = "Put " .. itemName .. " to selected Action Button automatically",
                 width = "full",
                 set = "Set",
                 get = "GetEnable"
@@ -64,24 +85,30 @@ function FWActionButtonConfig:GetOptions()
                     return not self:GetEnable()
                 end
             },
-            preferConjure = {
-                order = self:_AutoIncrementOrder(),
-                type = "select",
-                values = {
-                    [PREFER_CONJURE_TYPE.IGNORE] = "Ignore",
-                    [PREFER_CONJURE_TYPE.ALWAYS] = "Always",
-                    [PREFER_CONJURE_TYPE.BETTER] = "When it's better or equal"
-                },
-                name = "Prefer conjure",
-                desc = "Put confure " .. itemName .. " when it's available in this character's bags",
-                set = "Set",
-                get = "GetPreferConjure",
-                disabled = function()
-                    return not self:GetEnable()
-                end
-            }
         }
     }
+
+    -- Add confure options
+    if self.type == FW_TYPE.FOOD or self.type == FW_TYPE.WATER then
+        options.args.preferConjure = {
+            order = self:_AutoIncrementOrder(),
+            type = "select",
+            values = {
+                [PREFER_CONJURE_TYPE.IGNORE] = "Ignore",
+                [PREFER_CONJURE_TYPE.ALWAYS] = "Always",
+                [PREFER_CONJURE_TYPE.BETTER] = "When it's better or equal"
+            },
+            name = "Prefer conjure",
+            desc = "Put confure " .. itemName .. " when it's available in this character's bags",
+            set = "Set",
+            get = "GetPreferConjure",
+            disabled = function()
+                return not self:GetEnable()
+            end
+        }
+    end
+
+    return options
 end
 
 function FWActionButtonConfig:GetEnable()
@@ -96,7 +123,14 @@ function FWActionButtonConfig:GetPreferConjure()
     return self:Get("preferConjure")
 end
 
-function FWActionButtonConfig:GetDefaults()
+function FWActionButtonConfig:GetDefaults(type)
+    if type == FW_TYPE.HEALING_POTION or type == FW_TYPE.MANA_POTION then
+        return {
+            enable = true,
+            key = nil,
+        }
+    end
+
     return {
         enable = true,
         key = nil,

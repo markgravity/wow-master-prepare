@@ -7,7 +7,9 @@ local L = LibStub("AceLocale-3.0"):GetLocale(MASTER_PREPARE_NAME)
 
 local FW_TYPE = {
     FOOD = "food",
-    WATER = "water"
+    WATER = "water",
+    HEALING_POTION = "healing_potion",
+    MANA_POTION = "mana_potion"
 }
 MasterPrepare.FW_TYPE = FW_TYPE
 

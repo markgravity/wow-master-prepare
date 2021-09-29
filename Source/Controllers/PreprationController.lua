@@ -55,12 +55,12 @@ function PreparationController:OnEvent(event)
         return
     end
 
-    if event == EVENT.TAXIMAP_OPENED or event == EVENT.CONFIRM_SUMMON then
-        local isPrepared = self:_Check()
-        if not isPrepared then
-            Dialog:Confirm("YOU'RE NOT PREPARED!!\nAre you sure you want to go?")
-        end
-    end
+    -- if event == EVENT.TAXIMAP_OPENED or event == EVENT.CONFIRM_SUMMON then
+    --     local isPrepared = self:_Check()
+    --     if not isPrepared then
+    --         Dialog:Confirm("YOU'RE NOT PREPARED!!\nAre you sure you want to go?")
+    --     end
+    -- end
 end
 
 function PreparationController:_Check()

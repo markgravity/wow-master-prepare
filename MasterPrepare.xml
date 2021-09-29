@@ -14,10 +14,12 @@
     <Script file="Source\Resources\Locales\enUS.lua"/>
     <Script file="Source\Resources\Foods.lua"/>
     <Script file="Source\Resources\Waters.lua"/>
+    <Script file="Source\Resources\Potions.lua"/>
     <Script file="Source\Config\FWBuyConfig.lua"/>
     <Script file="Source\Config\FWSellConfig.lua"/>
     <Script file="Source\Config\FWActionButtonConfig.lua"/>
     <Script file="Source\Config\FWConfig.lua"/>
+    <Script file="Source\Config\PotionConfig.lua"/>
     <Script file="Source\Config\GearRepairConfig.lua"/>
     <Script file="Source\Config\GearSellConfig.lua"/>
     <Script file="Source\Config\GearConfig.lua"/>

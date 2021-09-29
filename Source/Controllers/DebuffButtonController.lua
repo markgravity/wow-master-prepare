@@ -29,7 +29,8 @@ function DebuffButtonController:OnEvent(event)
 end
 
 function DebuffButtonController:OnMessage(message, isPrepared, food, water, repair, sell)
-    if self.debuffButtonIndex then
+    --print(self.debuffButtonIndex)
+    if self.debuffButtonIndex ~= nil then
         local button = _G["DebuffButton" .. self.debuffButtonIndex]
         button:Hide()
     end
@@ -45,9 +46,8 @@ end
 
 function DebuffButtonController:Show()
     local buttonName = "DebuffButton"
-
     if not IsResting() or self.isPrepared then
-        if self.debuffButtonIndex then
+        if self.debuffButtonIndex ~= nil then
             local button = _G[buttonName .. self.debuffButtonIndex]
             button:Hide()
         end
@@ -56,9 +56,10 @@ function DebuffButtonController:Show()
     end
 
     local index = self.debuffButtonIndex or DEBUFF_ACTUAL_DISPLAY + 1
+    --print(self.debuffButtonIndex,index)
     local buttonFrameName = buttonName .. index
-    local buff
-    if not _G[buttonFrameName] then
+    local buff = _G[buttonFrameName]
+    if not buff then
         self.debuffButtonIndex = index
         buff = CreateFrame(FRAME_TYPE.BUTTON, buttonFrameName, BuffFrame, FRAME_TEMPLATE.DEBUFF_BUTTON);
         buff:SetScript(SCRIPT_HANDLER.ON_ENTER, function()
@@ -70,10 +71,9 @@ function DebuffButtonController:Show()
 
         DEBUFF_ACTUAL_DISPLAY = DEBUFF_ACTUAL_DISPLAY + 1
     else
-        buff = _G["DebuffButton" .. index]
         buff:Show()
     end
-
+    --print("show")
     DebuffButton_UpdateAnchors(buttonName, index)
 
     -- Set color of debuff border based on dispel class.

@@ -18,13 +18,17 @@
                 const name = response.name
 
                 // Get effect value
-                var stat = ""
+                let stat = "";
                 switch (type){
                     case "food":
                         stat = "health"
                         break
                     case  "water":
                         stat = "mana"
+                        break
+
+                    case  "potion":
+                        stat = "to"
                         break
                 }
 
@@ -47,6 +51,7 @@
 <textarea id="input">4536,117,11109,787,17344,20857,4604,19223,2070,4540,16166,4592,2287,4537,4541,16167,17406,414,4605,17119,18633,19304,4593,3770,7228,4538,16170,422,4606,19305,4542,4539,4594,3771,4544,18632,1707,4607,17407,16169,19224,4599,4602,4608,4601,3927,21552,16168,18635,17408</textarea>
 <button onclick="fetch('food')">fetch food</button>
 <button onclick="fetch('mana')">fetch mana</button>
+<button onclick="fetch('potion')">fetch potion</button>
 <textarea readonly id="output"></textarea>
 </body>
 </html>

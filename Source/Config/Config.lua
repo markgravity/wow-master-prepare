@@ -11,6 +11,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale(MASTER_PREPARE_NAME)
 local FWConfig = MasterPrepare.FWConfig
 local FW_TYPE = MasterPrepare.FW_TYPE
 local GearConfig = MasterPrepare.GearConfig
+local PotionConfig = MasterPrepare.PotionConfig
 
 local Config = {}
 MasterPrepare.Config = Config
@@ -21,6 +22,7 @@ function Config:Setup()
     self.food = FWConfig:Init(FW_TYPE.FOOD, self.db.char, 1)
     self.water = FWConfig:Init(FW_TYPE.WATER, self.db.char, 2)
     self.gear = GearConfig:Init(self.db.char.gear, 3)
+    self.potion = PotionConfig:Init(self.db.char.potion, 4)
 
     -- Register config
     AceConfig:RegisterOptionsTable(MASTER_PREPARE_NAME, self:GetOptions())
@@ -46,6 +48,7 @@ function Config:GetOptions()
             food = self.food:GetOptions(),
             water = self.water:GetOptions(),
             gear = self.gear:GetOptions(),
+            potion = self.potion:GetOptions()
         },
     }
 end
@@ -55,7 +58,8 @@ function Config:GetDeaults()
        char = {
            food = FWConfig:GetDefaults(),
            water = FWConfig:GetDefaults(),
-           gear = GearConfig:GetDefaults()
+           gear = GearConfig:GetDefaults(),
+           potion = PotionConfig:GetDefaults()
        }
     }
 end

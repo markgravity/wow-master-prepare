@@ -27,6 +27,7 @@ function GearRepairService:Check()
 
     self.needed = overollDurability <= Config.gear.repair:GetMinDurability()
     self.overollDurability = math.floor(overollDurability)
+
     return not self.needed, self.overollDurability
 end
 
@@ -82,7 +83,7 @@ function GearRepairService:_GetOverallInventoryItemsDurability()
         local current, maximum = GetInventoryItemDurability(slotID);
 
         if current and maximum then
-            local percent = current / maximum
+            local percent = current * 100 / maximum
             durabilityCount = durabilityCount + 1
             durabilityPercent = durabilityPercent + percent
         end

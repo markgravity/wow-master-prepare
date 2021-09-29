@@ -16,15 +16,13 @@ MasterPrepare.VENDOR_WATERS = {
     --{ id = 13724, effectValue = 2148, minLevel = 45 }, -- Enriched Manna Biscuit
     { id = 8766, effectValue = 2934, minLevel = 45 }, -- Morning Glory Dew
     { id = 38429, effectValue = 2934, minLevel = 45 }, -- Blackrock Spring Water
-    { id = 32455, effectValue = 4200, minLevel = 55 }, -- Star's Lament
-    { id = 29454, effectValue = 5100, minLevel = 55 }, -- Silverwine
+    { id = 32455, effectValue = 4200, minLevel = 60 }, -- Star's Lament
+    { id = 29454, effectValue = 5100, minLevel = 60 }, -- Silverwine
     { id = 28399, effectValue = 5100, minLevel = 60 }, -- Filtered Draenic Water
-    { id = 38430, effectValue = 5100, minLevel = 60 }, -- Blackrock Mineral Water
     { id = 27860, effectValue = 7200, minLevel = 65 }, -- Purified Draenic Water
     { id = 32453, effectValue = 7200, minLevel = 65 }, -- Star's Tears
     { id = 33042, effectValue = 7200, minLevel = 65 }, -- Black Coffee
     { id = 29395, effectValue = 7200, minLevel = 65 }, -- Ethermead
-    { id = 32722, effectValue = 4320, minLevel = 65 }, -- Enriched Terocone Juice
     { id = 29401, effectValue = 7200, minLevel = 65 }, -- Sparkling Southshore Cider
     { id = 38431, effectValue = 7200, minLevel = 65 }, -- Blackrock Fortified Water
 }
@@ -36,7 +34,7 @@ MasterPrepare.CONJURE_WATERS = {
     { id = 3772, effectValue = 1345, minLevel = 25 }, -- Conjured Spring Water
     { id = 8077, effectValue = 1992, minLevel = 35 }, -- Conjured Mineral Water
     { id = 8078, effectValue = 2934, minLevel = 45 }, -- Conjured Sparkling Water
-    { id = 8079, effectValue = 4200, minLevel = 55 }, -- Conjured Crystal Water
+    { id = 8079, effectValue = 4200, minLevel = 60 }, -- Conjured Crystal Water
     { id = 30703, effectValue = 5100, minLevel = 60 }, -- Conjured Mountain Spring Water
     { id = 34062, effectValue = 7500, minLevel = 65 }, -- Conjured Manna Biscuit
     { id = 22018, effectValue = 7200, minLevel = 65 }, -- Conjured Glacier Water
