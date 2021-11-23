@@ -1,34 +1,17 @@
-# Master Prepare
+Overview
+--------
 
-```javascript
-function copy(text) {
-    var textArea = document.createElement("textarea");
-    textArea.value = text;
+MasterPrepare is life easier when leveling. It provides features such as:
 
-    // Avoid scrolling to bottom
-    textArea.style.top = "0";
-    textArea.style.left = "0";
-    textArea.style.position = "fixed";
+-   Auto buy foods and waters
+-   Auto put foods, waters, healing/mana potions into Action Bar
+-   Auto sell junk items
+-   Auto repair
 
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
+Type /mp to open configure panel
 
-    try {
-        var successful = document.execCommand('copy');
-        var msg = successful ? 'successful' : 'unsuccessful';
-        console.log('Fallback: Copying text command was ' + msg);
-    } catch (err) {
-        console.error('Fallback: Oops, unable to copy', err);
-    }
+Notes
+-----
 
-    document.body.removeChild(textArea);
-}
-
-output = Array.from($(".listview-row td:nth-child(3) a.q1").map((i, e) => {
-    id = $(e).attr("href").split("/")[1].split("=")[1];
-    name = $(e).text()
-    return `${id}`
-})).join(",")
-copy(output)
-```
+-   Please submit bugs and feature requests at [GitHub](https://github.com/markgravity/wow-master-prepare). 
+-   Please consider supporting by submitting a [donation](https://paypal.me/markgravity?locale.x=en_US).
