@@ -33,7 +33,6 @@ function GearSellService:_GetJunkItemsInBags()
         if numSlots > 0 then
             for slot = 1, numSlots do
                 local containerItemInfo = ContainerItemInfo:Init(bag, slot)
-
                 -- Checking item quality threshold
                 if containerItemInfo.quality and containerItemInfo.quality <= Config.gear.sell:GetQualityThreshold() then
                     local itemID = GetContainerItemID(bag, slot)
@@ -52,11 +51,12 @@ function GearSellService:_GetJunkItemsInBags()
 end
 
 function GearSellService:_IsSellable(item, quality)
+    if quality == 0 then return true end
     if item.sellPrice == nil or item.sellPrice == 0 then
         return false
     end
 
-    if quality >= ITEM_QUALITY.COMMON and item.type ~= ITEM_TYPE.ARMOR and item.type ~= ITEM_TYPE.WEAPON then
+    if item.type ~= ITEM_TYPE.ARMOR and item.type ~= ITEM_TYPE.WEAPON then
         return false
     end
 

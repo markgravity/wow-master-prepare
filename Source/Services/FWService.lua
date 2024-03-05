@@ -167,6 +167,10 @@ function FWService:_GetNumberNeeded(items)
     local config = self:_GetConfig().buy
     local current = self:_GetTotalQuantityInBags(items)
 
+    if not config:GetEnable() then
+        return 0, current
+    end
+
     if (config:GetAlwaysRestock() and current < config:GetMaxRestock())
             or current < config:GetMinRestock() then
         return config:GetMaxRestock() - current, current
@@ -182,8 +186,9 @@ function FWService:_GetTotalQuantityInBags(items)
             if numSlots > 0 then
                 for slot = 1, numSlots do
                     local itemID = GetContainerItemID(bag, slot)
-                    if item.id == itemID then
-                        local containerItemInfo = ContainerItemInfo:Init(bag, slot)
+                    local containerItemInfo = ContainerItemInfo:Init(bag, slot)
+                    if item.id == itemID and containerItemInfo.itemCount then
+                        
                         totalQuantity = totalQuantity + containerItemInfo.itemCount
                     end
                 end
@@ -209,7 +214,7 @@ function FWService:FindItemToUse()
             for slot = 1, numSlots do
                 local containerItemInfo = ContainerItemInfo:Init(bag, slot)
                 local itemID = GetItemID(containerItemInfo.itemLink)
-
+                -- print(containerItemInfo.itemLink)
                 if itemID and (usableItems[itemID] ~= nil or usableConjures[itemID] ~= nil) then
                     local objects = items
                     local item = usableItems[itemID]
@@ -251,6 +256,7 @@ end
 
 function FWService:_FindBestItem(items)
     local bestItem
+
     for _, item in pairs(items) do
         if bestItem == nil then
             bestItem = item

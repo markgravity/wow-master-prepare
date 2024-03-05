@@ -12,6 +12,10 @@ function CombuctorBagProvider:IsEnabled()
     return IsAddOnLoaded("Combuctor")
 end
 
+function GetContainerItemLink(containerIndex, slotIndex)
+    return C_Container.GetContainerItemLink(containerIndex, slotIndex);
+end
+
 function CombuctorBagProvider:GetButtons()
     local buttons = {}
     for bagNumber = 0, NUM_BAG_SLOTS do

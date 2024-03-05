@@ -121,3 +121,29 @@ function Wait(delay, func, ...)
     tinsert(waitTable, { delay, func, { ... } });
     return true;
 end
+
+if not GetContainerNumSlots then
+    function GetContainerNumSlots(containerIndex)
+        return C_Container.GetContainerNumSlots(containerIndex);
+    end
+
+    function GetContainerItemID(containerIndex, slotIndex)
+        return C_Container.GetContainerItemID(containerIndex, slotIndex);
+    end
+
+    function GetContainerItemDurability(containerIndex, slotIndex)
+        return C_Container.GetContainerItemDurability(containerIndex, slotIndex);
+    end
+
+    function GetContainerItemInfo(containerIndex, slotIndex)
+        return C_Container.GetContainerItemInfo(containerIndex, slotIndex);
+    end
+
+    function GetContainerItemLink(containerIndex, slotIndex)
+        return C_Container.GetContainerItemLink(containerIndex, slotIndex);
+    end
+
+    function PickupContainerItem(containerIndex, slotIndex)
+        return C_Container.PickupContainerItem(containerIndex, slotIndex);
+    end
+end

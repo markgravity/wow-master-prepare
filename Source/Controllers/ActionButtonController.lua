@@ -62,7 +62,6 @@ function ActionButtonController:_Check()
 
     if self.actionItem == nil then
         self.actionItem = self.prepration:FindItemToUse()
-
         if self.actionItem then
             self:_Swap(self.actionItem, actionSlot)
         end
@@ -89,7 +88,7 @@ function ActionButtonController:_Check()
 end
 
 function ActionButtonController:_Swap(item, actionSlot)
-    PickupContainerItem(item.bag, item.slot)
+    (PickupContainerItem or C_Container.PickupContainerItem)(item.bag, item.slot)
     PlaceAction(actionSlot)
     PutItemInBackpack()
 end

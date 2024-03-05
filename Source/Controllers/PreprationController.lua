@@ -133,8 +133,12 @@ function PreparationController:_Prepare()
 
     -- Nothing to restock
     if numFoodNeeded + numDrinkNeeded <= 0 then
-        totalSellPrice = totalSellPrice + self:_Sell(self.food.junkItems)
-        totalSellPrice = totalSellPrice + self:_Sell(self.water.junkItems)
+        if self.food.junkItems then
+            totalSellPrice = totalSellPrice + self:_Sell(self.food.junkItems)
+        end
+        if self.water.junkItems then
+            totalSellPrice = totalSellPrice + self:_Sell(self.water.junkItems)
+        end
     else
         -- Buy foods or waters from merchant, if it's available
         for i = 1, GetMerchantNumItems() do
@@ -181,6 +185,7 @@ end
 
 function PreparationController:_Sell(items)
     local totalSellPrice = 0
+    if items == nil then return end
     for bag = 0, NUM_BAG_SLOTS do
         local numSlots = GetContainerNumSlots(bag)
         if numSlots > 0 then
@@ -188,7 +193,7 @@ function PreparationController:_Sell(items)
                 local containerItemInfo = ContainerItemInfo:Init(bag, slot)
                 local itemID = GetContainerItemID(bag, slot)
                 local item = ItemInfo:Init(itemID)
-                if item and items[itemID] then
+                if item and items[itemID] and containerItemInfo.itemCount then
                     totalSellPrice = totalSellPrice + item.sellPrice * containerItemInfo.itemCount
                     SellContainerItemToMerchant(bag, slot)
                 end
